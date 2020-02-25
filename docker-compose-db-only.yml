@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:10.6-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./django_init.sql:/docker-entrypoint-initdb.d/django_init.sql:ro"

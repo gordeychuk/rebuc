@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:10.6-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./django_init.sql:/docker-entrypoint-initdb.d/django_init.sql:ro"
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sh ./run_django.sh
+    volumes:
+      - .:/code
+      - /code/rebuc-frontend/node_modules
+    ports:
+      - "8002:8002"
+    environment:
+      - APP_DEBUG=False
+    depends_on:
+      - db
+    links:
+      - db

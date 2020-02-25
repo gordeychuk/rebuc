@@ -1,0 +1,563 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "Release build configuration API",
+    "description" : "REST API for Rebuc App",
+    "version" : "1.0",
+    "contact": {
+      "name": "Sergei Gordeichuk",
+      "email": "gordeychuk.s@gmail.com"
+    },
+    "license": {
+      "name": "MIT License"
+    }
+  },
+  "tags": [
+    {
+      "name": "login"
+    },
+    {
+      "name": "releases"
+    },
+    {
+      "name": "builds"
+    }
+  ],
+  "servers" : [ {
+    "url" : "http://localhost:8002/api-v1/"
+  }
+  ],
+  "paths" : {
+    "/login/" : {
+      "post" : {
+        "summary" : "Endpoint for login and getting token for POST / PUT / DELETE requests.",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "password" : {
+                    "type" : "string"
+                  },
+                  "username" : {
+                    "type" : "string"
+                  }
+                }
+              },
+              "examples" : {
+                "Successfull login" : {
+                  "value" : "{\n  \"username\": \"admin\", \n  \"password\": \"password\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["login"],
+        "responses" : {
+          "200" : {
+            "description" : "Success",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/login"
+                },
+                "examples" : {
+                  "Successfull login" : {
+                    "value" : "{\n  \"token\":\"ff6f741b27f075bde897d2b9d7c4a2dc8a6b575f\",\n  \"first_name\":\"Admin\",\n  \"last_name\":\"User\",\n  \"is_admin\":true,\n  \"avatar_url\":\"https://api.adorable.io/avatars/face/eyes5/nose4/mouth6/eeeeff\"\n}"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description": "Failure: username or password was not provided.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Failed login" : {
+                    "value" : "{\n \"error\": \"Please provide both username and password\" \n}"
+                  }
+                }
+              }
+            }
+          },
+        "404" : {
+            "description": "Failure: username or password is incorrect.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Failed login" : {
+                    "value" : "{\n \"error\": \"Invalid Credentials\" \n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/releases/" : {
+      "get" : {
+        "summary": "Endpoint to get list of releases.",
+        "tags": ["releases"],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/releases"
+                }
+                }
+              }
+            }
+          }
+        },
+      "post": {
+        "summary": "Endpoint to create new release.",
+        "tags": ["releases"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "Token 123dsfkj234kdhflkshsdfsdkn"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/release_post_body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfull",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/release"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Incorrect request body. Usually happens when start build / build mask is incorrect."
+          }
+        }
+      }
+    },
+    "/release/{releaseId}": {
+      "get": {
+        "summary": "Get info about release.",
+        "tags": ["releases"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "releaseId",
+            "required": true,
+            "description": "ID of the release.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfull",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/release"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Release with given ID is not found."
+          }
+        }
+      },
+      "put": {
+        "summary": "Update info about release",
+        "tags": ["releases"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "releaseId",
+            "required": true,
+            "description": "ID of the release.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/release_post_body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfull",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/release"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Release with given ID is not found."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete release.",
+        "tags": ["releases"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "releaseId",
+            "required": true,
+            "description": "ID of the release.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Delete successfull"
+          },
+          "404": {
+            "description": "Release with given ID is not founnd."
+          }
+        }
+      }
+    },
+    "/builds/": {
+      "get" : {
+        "summary": "Endpoint to get list of builds.",
+        "tags": ["builds"],
+        "responses": {
+          "200": {
+            "description": "Success.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/builds"
+                }
+                }
+              }
+            }
+          }
+        },
+      "post": {
+        "summary": "Endpoint to create new build.",
+        "tags": ["builds"],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "example": "Token 123dsfkj234kdhflkshsdfsdkn"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/build_post_body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfull",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/build"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Incorrect request body. For example build name is not unique."
+          }
+        }
+      }
+    },
+    "/builds/{buildId}": {
+      "get": {
+        "summary": "Get info about build.",
+        "tags": ["builds"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "buildId",
+            "required": true,
+            "description": "ID of the build.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfull",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/build"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Build with given ID is not found."
+          }
+        }
+      },
+      "put": {
+        "summary": "Update info about build",
+        "tags": ["builds"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "buildId",
+            "required": true,
+            "description": "ID of the build.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/build_post_body"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfull",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/build"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Build with given ID is not found."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete build.",
+        "tags": ["builds"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "buildId",
+            "required": true,
+            "description": "ID of the build.",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Delete successfull"
+          },
+          "404": {
+            "description": "Build with given ID is not found."
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "release_post_body": {
+        "type": "object",
+        "required": ["name", "release_date", "build_mask", "start_build"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "release_date": {
+            "type": "string",
+            "description": "Release date should be in this format: MM/DD/YYYY"
+          },
+          "build_mask": {
+            "type": "string",
+            "description": "Build mask as a string looks like this: 1.0.x where \"x\" is the variable octet. Only one \"x\" can exist in the build mask. Build mask should have at least one dot."
+          },
+          "start_build": {
+            "type": "object",
+            "required": ["id"],
+            "properties": {
+              "id": {
+                "type": "number",
+                "description": "ID of the existing build."
+              }
+            }
+          }
+        }
+      },
+      "release": {
+        "type": "object",
+        "properties" : {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "release_date": {
+            "type": "string"
+          },
+          "builds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "release_pattern": {
+            "type": "object",
+            "properties": {
+              "start_build": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "build_mask": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "releases": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "$ref": "#/components/schemas/release"
+        }
+      },
+      "build_post_body": {
+        "type": "object",
+        "required": ["name, release_date, url"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the build, should be unique."
+          },
+          "description": {
+            "type": "string"
+          },
+          "release_date": {
+            "type": "string",
+            "description": "Release date should be in this format: MM/DD/YYYY"
+          },
+          "release_notes": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "release_id": {
+            "type": "string",
+            "description": "ID of the release to add. Add \"0\" if build should not have a release. If release_id is not specified than it will be detected automatically based on available build masks."
+          }
+        }
+      },
+      "build": {
+        "type": "object",
+        "properties" : {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "release_date": {
+            "type": "string"
+          },
+          "release_notes": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "builds": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "$ref": "#/components/schemas/build"
+        }
+      },
+      "login" : {
+        "type" : "object",
+        "properties" : {
+          "is_admin" : {
+            "type" : "boolean"
+          },
+          "avatar_url" : {
+            "type" : "string"
+          },
+          "last_name" : {
+            "type" : "string"
+          },
+          "first_name" : {
+            "type" : "string"
+          },
+          "token" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}
