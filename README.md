@@ -9,6 +9,8 @@ Releases &amp; builds configuration tool - it's a simple tool for release and bu
 
 
 ## Installation
-`docker-compose up -f docker-compose-dev.yml`
+- Run `docker-compose up -f docker-compose-dev.yml` 
+<br/>
+- Go to http://localhost:8002/
 
 
