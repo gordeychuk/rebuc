@@ -18,7 +18,6 @@ RUN apk update \
   && apk del build-deps
 
 WORKDIR /code/rebuc-frontend
-RUN yarn upgrade
 RUN yarn install
 
 WORKDIR /code
