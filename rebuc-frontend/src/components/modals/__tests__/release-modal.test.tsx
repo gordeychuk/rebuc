@@ -1,15 +1,16 @@
 import React from 'react';
-import { render, fireEvent, configure, queryByAttribute, waitForElement } from '@testing-library/react';
+import { render, fireEvent, configure } from '@testing-library/react';
 import {CreateUpdateReleaseModal} from "../add-edit-release-modal";
 import {act} from "react-dom/test-utils";
 import { AuthContext } from '../../../context/auth';
 import * as apiReleases from "../../../api-helpers/api-releases";
+import {selectBuild} from "./common";
 
 configure({testIdAttribute: 'data-cy'});
 jest.mock("../../../api-helpers/api-builds");
 jest.mock("../../../api-helpers/api-releases");
 
-const DOWN_ARROW = { keyCode: 40 };
+
 const testRelease = {
     id: '0',
     name: 'test',
@@ -52,14 +53,22 @@ const submitReleaseModal = (modal: any) => {
     });
 };
 
-const selectBuild = async (modal: any) => {
-    const buildSelect = modal.getByTestId('releaseStartBuild').querySelector('#buildSelect');
-    if (buildSelect) {
-        fireEvent.keyDown(buildSelect, DOWN_ARROW);
-    }
+const checkWarnings = (
+    modal: any, nameEmpty: boolean, maskEmpty: boolean, maskInvalid: boolean, startBuildEmpty: boolean) => {
+    const errorMessages = {
+        'Release name cannot be empty.': nameEmpty,
+        'Build mask cannot be empty.': maskEmpty,
+        'Start build doesn\'t fit instance mask': maskInvalid,
+        'Start build cannot be empty.': startBuildEmpty
+    };
 
-    const option = await waitForElement(() => modal.getByText('1.0.0'));
-    fireEvent.click(option);
+    for (let [message, value] of Object.entries(errorMessages)) {
+        if (value) {
+            expect(modal.queryByText(message)).toBeNull();
+        } else {
+            expect(modal.queryByText(message)).toBeInTheDocument();
+        }
+    }
 };
 
 test('opens create release modal', () => {
@@ -88,10 +97,7 @@ test('shows create release modal validation errors empty name', async () => {
     fireEvent.change(modal.getByTestId('releaseBuildMask'), {target: {value: '1.0.x'}});
     await selectBuild(modal);
     submitReleaseModal(modal);
-    expect(modal.queryByText('Build mask cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Release name cannot be empty.')).toBeInTheDocument();
-    expect(modal.queryByText('Start build doesn\'t fit instance mask')).toBeNull();
+    checkWarnings(modal, false, true, true, true);
 });
 
 test('shows edit release modal validation errors empty name', async () => {
@@ -101,10 +107,7 @@ test('shows edit release modal validation errors empty name', async () => {
     fireEvent.change(modal.getByTestId('releaseBuildMask'), {target: {value: '1.0.x'}});
     await selectBuild(modal);
     submitReleaseModal(modal);
-    expect(modal.queryByText('Build mask cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Release name cannot be empty.')).toBeInTheDocument();
-    expect(modal.queryByText('Start build doesn\'t fit instance mask')).toBeNull();
+    checkWarnings(modal, false, true, true, true);
 });
 
 test('shows create release modal validation errors empty start build', () => {
@@ -113,10 +116,7 @@ test('shows create release modal validation errors empty start build', () => {
     fireEvent.change(modal.getByTestId('releaseName'), {target: {value: '1.0.0'}});
     fireEvent.change(modal.getByTestId('releaseBuildMask'), {target: {value: '1.0.x'}});
     submitReleaseModal(modal);
-    expect(modal.queryByText('Build mask cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build cannot be empty.')).toBeInTheDocument();
-    expect(modal.queryByText('Release name cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build doesn\'t fit instance mask')).toBeNull();
+    checkWarnings(modal, true, true, true, false);
 });
 
 test('shows create release modal validation errors empty build mask', async () => {
@@ -125,22 +125,15 @@ test('shows create release modal validation errors empty build mask', async () =
     fireEvent.change(modal.getByTestId('releaseName'), {target: {value: '1.0.0'}});
     await selectBuild(modal);
     submitReleaseModal(modal);
-    expect(modal.queryByText('Build mask cannot be empty.')).toBeInTheDocument();
-    expect(modal.queryByText('Start build cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Release name cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build doesn\'t fit instance mask')).toBeNull();
+    checkWarnings(modal, true, false, true, true);
 });
 
 test('shows edit release modal validation errors empty build mask', async () => {
     const modal = renderEditModal();
     openReleaseModal(modal);
     fireEvent.change(modal.getByTestId('releaseBuildMask'), {target: {value: ''}});
-    // await selectBuild(modal);
     submitReleaseModal(modal);
-    expect(modal.queryByText('Build mask cannot be empty.')).toBeInTheDocument();
-    expect(modal.queryByText('Start build cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Release name cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build doesn\'t fit instance mask')).toBeNull();
+    checkWarnings(modal, true, false, true, true);
 });
 
 test('shows create release modal validation errors build doesn\'t fit the mask', async () => {
@@ -150,10 +143,7 @@ test('shows create release modal validation errors build doesn\'t fit the mask',
     fireEvent.change(modal.getByTestId('releaseBuildMask'), {target: {value: '1.x'}});
     await selectBuild(modal);
     submitReleaseModal(modal);
-    expect(modal.queryByText('Build mask cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Release name cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build doesn\'t fit instance mask')).toBeInTheDocument();
+    checkWarnings(modal, true, true, false, true);
 });
 
 test('shows edit release modal validation errors build doesn\'t fit the mask', async () => {
@@ -161,10 +151,7 @@ test('shows edit release modal validation errors build doesn\'t fit the mask', a
     openReleaseModal(modal);
     fireEvent.change(modal.getByTestId('releaseBuildMask'), {target: {value: '1.x'}});
     submitReleaseModal(modal);
-    expect(modal.queryByText('Build mask cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Release name cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build doesn\'t fit instance mask')).toBeInTheDocument();
+    checkWarnings(modal, true, true, false, true);
 });
 
 test('submit create release modal', async () => {
@@ -176,10 +163,7 @@ test('submit create release modal', async () => {
     await selectBuild(modal);
     submitReleaseModal(modal);
     expect(mockPostRelease).toBeCalledTimes(1);
-    expect(modal.queryByText('Build mask cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Release name cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build doesn\'t fit instance mask')).toBeNull();
+    checkWarnings(modal, true, true, true, true);
 });
 
 test('submit edit release modal', async () => {
@@ -191,8 +175,5 @@ test('submit edit release modal', async () => {
     await selectBuild(modal);
     submitReleaseModal(modal);
     expect(mockPostRelease).toBeCalledTimes(1);
-    expect(modal.queryByText('Build mask cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Release name cannot be empty.')).toBeNull();
-    expect(modal.queryByText('Start build doesn\'t fit instance mask')).toBeNull();
+    checkWarnings(modal, true, true, true, true);
 });
