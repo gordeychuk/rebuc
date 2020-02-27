@@ -94,6 +94,7 @@ export class BuildsSelect extends Component<IBuildsSelectProps, ISelectState> {
                 ref={(ref: any) => {this.selectRef = ref; }}
                 placeholder='Select a build'
                 isDisabled={this.props.isDisabled}
+                inputId={'buildSelect'}
             />
             );
     }

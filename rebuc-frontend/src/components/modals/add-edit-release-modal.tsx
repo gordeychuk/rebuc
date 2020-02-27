@@ -59,6 +59,7 @@ export const CreateUpdateReleaseModal = (props: IReleaseModalProps) => {
         }
         setIsOpen(true);
     };
+
     const close = () => {
         setIsOpen(false);
         resetState();
@@ -104,14 +105,14 @@ export const CreateUpdateReleaseModal = (props: IReleaseModalProps) => {
                 const maskSplitted = buildMask.split('.');
                 const buildSplitted = startBuild.label.split('.');
                 if (maskSplitted.length !== buildSplitted.length) {
-                    setStartBuildError('Start instance doesn\'t fit instance mask');
+                    setStartBuildError('Start build doesn\'t fit instance mask');
                     return false;
                 }
 
                 for (let i = 0; i < maskSplitted.length; i++) {
                     if (maskSplitted[i].toLowerCase() !== 'x') {
                         if (maskSplitted[i] !== buildSplitted[i]) {
-                            setStartBuildError('Start instance doesn\'t fit instance mask');
+                            setStartBuildError('Start build doesn\'t fit instance mask');
                             return false;
                         }
                     }
@@ -121,7 +122,7 @@ export const CreateUpdateReleaseModal = (props: IReleaseModalProps) => {
                 return true;
             }
         }
-        setStartBuildError('Start instance cannot be empty');
+        setStartBuildError('Start build cannot be empty.');
         return false;
     };
 
@@ -236,6 +237,8 @@ export const CreateUpdateReleaseModal = (props: IReleaseModalProps) => {
     };
 
     const handleName = (e: any) => {
+        console.log('handle name called');
+        console.log(e.target.value);
         setName(e.target.value);
         setIsNameValid(true);
     };
@@ -314,7 +317,7 @@ export const CreateUpdateReleaseModal = (props: IReleaseModalProps) => {
 
     return (
         <span>
-            {props.isEdit ? <span onClick={open}>
+            {props.isEdit ? <span onClick={open} data-cy={'openAddRelease'}>
                 {props.trigger}
             </span> :
                 <Button
@@ -322,88 +325,95 @@ export const CreateUpdateReleaseModal = (props: IReleaseModalProps) => {
                     appearance='primary'
                     iconBefore={<AddIcon label=''/>}
                     isDisabled={!user}
+                    data-cy={'openAddRelease'}
                 >
                     Add release
                 </Button>}
-            <ModalTransition>
+            <ModalTransition >
                 {isOpen && (
-                    <ModalDialog
-                        onClose={close}
-                        heading={props.isEdit ? 'Update release' : 'Create release'}
-                        width='500px'
-                        components={{
-                            Footer: footer,
-                        }}
-                    >
-                        <StyledTextField
-                            onChange={handleName}
-                            placeholder={'Enter name'}
-                            description={'Release name'}
-                            incorrectMessage={'Release name cannot be empty.'}
-                            isValid={isNameValid}
-                            width={212}
-                            onKeyDown={handleKeyDown}
-                            isDisabled={false}
-                            defaultValue={props.instance ? props.instance.name : undefined}
-                            withRightPadding={true}
-                        />
-                        <StyledElement
-                            targetElement={
-                                <DatePicker
-                                    onChange={handleReleaseDate}
-                                    placeholder={"Pick release date"}
-                                    defaultValue={props.instance ? props.instance.release_date : undefined}
-                                />
-                            }
-                            description={'Release date'}
-                            incorrectMessage={''}
-                            isValid={true}
-
-                            width={212}
-                            withRightPadding={false}
-                        />
-                        <StyledTextArea
-                            onChange={handleDescription}
-                            placeholder={'Enter description'}
-                            description={'Description'}
-                            incorrectMessage={''}
-                            isValid={true}
-                            width={446}
-                            isDisabled={false}
-                            defaultValue={props.instance ? props.instance.description : undefined}
-                            withRightPadding={false}
-                        />
-                        <StyledTextField
-                            onChange={handleBuildMask}
-                            placeholder={'Enter build mask'}
-                            description={'Build mask'}
-                            incorrectMessage={buildMaskError}
-                            isValid={isBuildMaskValid}
-                            width={212}
-                            isDisabled={false}
-                            onKeyDown={onKeyDownBuildMask}
-                            defaultValue={props.instance ? props.instance.release_pattern.build_mask : undefined}
-                            withRightPadding={true}
-                        />
-                        <StyledElement
-                            targetElement={
-                                <BuildsSelect
-                                    onChange={handleStartBuild}
-                                    value={startBuild}
-                                    ref={dropdownBuildsRef}
-                                    onKeyDown={keyDownForBuilds}
-                                    defaultValue={props.instance ? {
-                                        label: props.instance.release_pattern.start_build.name,
-                                        value: props.instance.release_pattern.start_build.id
-                                    } : undefined}
-                                />}
-                            description={"Start build"}
-                            incorrectMessage={startBuildError}
-                            isValid={isStartBuildValid}
-                            width={212}
-                            withRightPadding={false}
-                        />
-                    </ModalDialog>
+                    <div data-cy={'releaseModal'}>
+                        <ModalDialog
+                            onClose={close}
+                            heading={props.isEdit ? 'Update release' : 'Create release'}
+                            width='500px'
+                            components={{
+                                Footer: footer,
+                            }}
+                        >
+                            <StyledTextField
+                                onChange={handleName}
+                                placeholder={'Enter name'}
+                                description={'Release name'}
+                                incorrectMessage={'Release name cannot be empty.'}
+                                isValid={isNameValid}
+                                width={212}
+                                onKeyDown={handleKeyDown}
+                                isDisabled={false}
+                                defaultValue={props.instance ? props.instance.name : undefined}
+                                withRightPadding={true}
+                                dataCy={'releaseName'}
+                            />
+                            <StyledElement
+                                targetElement={
+                                    <DatePicker
+                                        onChange={handleReleaseDate}
+                                        placeholder={"Pick release date"}
+                                        defaultValue={props.instance ? props.instance.release_date : undefined}
+                                    />
+                                }
+                                description={'Release date'}
+                                incorrectMessage={''}
+                                isValid={true}
+                                divDataCy={'releaseDate'}
+                                width={212}
+                                withRightPadding={false}
+                            />
+                            <StyledTextArea
+                                onChange={handleDescription}
+                                placeholder={'Enter description'}
+                                description={'Description'}
+                                incorrectMessage={''}
+                                isValid={true}
+                                width={446}
+                                isDisabled={false}
+                                defaultValue={props.instance ? props.instance.description : undefined}
+                                withRightPadding={false}
+                                dataCy={'releaseDesc'}
+                            />
+                            <StyledTextField
+                                onChange={handleBuildMask}
+                                placeholder={'Enter build mask'}
+                                description={'Build mask'}
+                                incorrectMessage={buildMaskError}
+                                isValid={isBuildMaskValid}
+                                width={212}
+                                isDisabled={false}
+                                onKeyDown={onKeyDownBuildMask}
+                                defaultValue={props.instance ? props.instance.release_pattern.build_mask : undefined}
+                                withRightPadding={true}
+                                dataCy={'releaseBuildMask'}
+                            />
+                            <StyledElement
+                                targetElement={
+                                    <BuildsSelect
+                                        onChange={handleStartBuild}
+                                        value={startBuild}
+                                        ref={dropdownBuildsRef}
+                                        onKeyDown={keyDownForBuilds}
+                                        defaultValue={props.instance ? {
+                                            label: props.instance.release_pattern.start_build.name,
+                                            value: props.instance.release_pattern.start_build.id
+                                        } : undefined}
+                                    />}
+                                description={"Start build"}
+                                incorrectMessage={startBuildError}
+                                isValid={isStartBuildValid}
+                                width={212}
+                                withRightPadding={false}
+                                divDataCy={'releaseStartBuild'}
+                            />
+                        </ModalDialog>
+                    </div>
                 )}
             </ModalTransition>
         </span>
