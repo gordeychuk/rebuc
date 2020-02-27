@@ -96,6 +96,7 @@ export const CreateUpdateReleaseModal = (props: IReleaseModalProps) => {
             }
         }
         setBuildMaskError('Build mask cannot be empty.');
+        setIsBuildMaskValid(false);
         return false;
     };
 
@@ -112,7 +113,7 @@ export const CreateUpdateReleaseModal = (props: IReleaseModalProps) => {
                 for (let i = 0; i < maskSplitted.length; i++) {
                     if (maskSplitted[i].toLowerCase() !== 'x') {
                         if (maskSplitted[i] !== buildSplitted[i]) {
-                            setStartBuildError('Start build doesn\'t fit instance mask');
+                            setStartBuildError('0');
                             return false;
                         }
                     }
@@ -237,8 +238,6 @@ export const CreateUpdateReleaseModal = (props: IReleaseModalProps) => {
     };
 
     const handleName = (e: any) => {
-        console.log('handle name called');
-        console.log(e.target.value);
         setName(e.target.value);
         setIsNameValid(true);
     };
@@ -259,6 +258,8 @@ export const CreateUpdateReleaseModal = (props: IReleaseModalProps) => {
     const handleBuildMask = (e: any) => {
         if (!e.target.value) {
             setIsBuildMaskValid(false);
+            validateBuildMask();
+            setBuildMask('');
         } else {
             setBuildMask(e.target.value);
             setIsBuildMaskValid(true);
