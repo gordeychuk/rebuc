@@ -47,7 +47,7 @@ export const ConfirmationModal = (props: IConfirmationModalProps) => {
 
     return (
         <span>
-            <span onClick={open}>
+            <span onClick={open} data-cy={'openModal'}>
                 {props.trigger}
             </span>
 

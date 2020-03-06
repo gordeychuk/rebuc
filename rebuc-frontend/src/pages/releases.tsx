@@ -60,7 +60,7 @@ const tableHeader = {
     ]
 };
 
-const ReleasesRouteBase = (props: IReleasesRouteBaseProps) => {
+export const ReleasesRouteBase = (props: IReleasesRouteBaseProps) => {
     const [flagGroup, setFlagGroup] = useState<ReactElement[]>([]);
     const [flagCounter, setFlagCounter] = useState<number>(0);
     const [releases, setReleases] = useState<ITableRow[]>([]);
@@ -144,9 +144,7 @@ const ReleasesRouteBase = (props: IReleasesRouteBaseProps) => {
             />
         ;
 
-        console.log(newFlagElement);
         newFlagGroup.push(newFlagElement);
-        console.log(newFlagGroup);
         setFlagGroup(newFlagGroup);
         setTimeout(() => handleDismiss(), 7000);
     };

@@ -22,18 +22,18 @@ const DisableTryItOutPlugin = function() {
 
 
 
-const ApiRouteBase = (props: IApiRouteBaseProps) => {
+export const ApiRouteBase = (props: IApiRouteBaseProps) => {
     useEffect(() => {
         props.navigationViewController.setView(releasesView.id);
     }, [props.navigationViewController]);
 
 
     return (
-            <div data-cy='buildsList'>
+            <div data-cy='swagger'>
                 <Helmet>
                     <title>REST API</title>
                 </Helmet>
-                <SwaggerUI url="/static/openapi.json" plugins={[DisableTryItOutPlugin]} />
+                <SwaggerUI url="openapi.json" plugins={[DisableTryItOutPlugin]} />
           </div>
         );
 };

@@ -235,7 +235,7 @@ export const CreateUpdateBuildModal = (props: IBuildModalProps) => {
 
     return (
         <div>
-            {props.isEdit ? <span onClick={open}>
+            {props.isEdit ? <span onClick={open} data-cy={'openAddBuild'}>
                 {props.trigger}
             </span> :
                 <Button
@@ -243,104 +243,114 @@ export const CreateUpdateBuildModal = (props: IBuildModalProps) => {
                     appearance='primary'
                     iconBefore={<AddIcon label=''/>}
                     isDisabled={!user}
+                    data-cy={'openAddBuild'}
                 >
                     Add build
                 </Button>}
             <ModalTransition>
                 {isOpen && (
-                    <ModalDialog
-                        onClose={close}
-                        heading={props.isEdit ? 'Update build' : 'Create build'}
-                        width='600px'
-                        components={{
-                            Footer: footer,
-                        }}
-                    >
-                        <StyledTextField
-                            onChange={handleName}
-                            placeholder={'Enter name'}
-                            description={'Build name'}
-                            incorrectMessage={'Build name cannot be empty.'}
-                            isValid={isNameValid}
-                            width={362}
-                            onKeyDown={handleKeyDown}
-                            isDisabled={false}
-                            defaultValue={props.instance ? props.instance.name : undefined}
-                            withRightPadding={true}
-                        />
-                        <StyledElement
-                            targetElement={
-                                <DatePicker
-                                    onChange={handleReleaseDate}
-                                    placeholder={"Pick a date"}
-                                    defaultValue={props.instance ? props.instance.release_date : undefined}
-                                    isInvalid={!isReleaseDateValid}
-                                />
-                            }
-                            description={'Release date'}
-                            incorrectMessage={'Release date cannot be empty.'}
-                            isValid={true}
-                            width={162}
-                            withRightPadding={false}
-                        />
-                        <StyledTextArea
-                            onChange={handleDescription}
-                            placeholder={'Enter description'}
-                            description={'Description'}
-                            incorrectMessage={''}
-                            isValid={true}
-                            width={546}
-                            isDisabled={false}
-                            defaultValue={props.instance ? props.instance.description : undefined}
-                            withRightPadding={false}
-                        />
-                        <StyledTextField
-                            onChange={handleReleaseNotes}
-                            placeholder={'Enter notes'}
-                            description={'Release notes'}
-                            incorrectMessage={''}
-                            isValid={true}
-                            width={546}
-                            isDisabled={false}
-                            onKeyDown={handleKeyDown}
-                            defaultValue={props.instance ? props.instance.release_notes : undefined}
-                            withRightPadding={false}
-                        />
-                        <StyledElement
-                            targetElement={
-                                <ReleasesSelect
-                                    onChange={handleReleaseSelect}
-                                    value={release}
-                                    ref={dropdownReleaseRef}
-                                    onKeyDown={keyDownForReleases}
-                                    isDisabled={isAutoDetect}
-                                    defaultValue={props.release}
-                                />}
-                            description={"Release"}
-                            incorrectMessage={""}
-                            isValid={true}
-                            width={162}
-                            withRightPadding={true}
-                        />
-                        <StyledTextField
-                            onChange={handleUrl}
-                            placeholder={'Enter URL'}
-                            description={'URL'}
-                            incorrectMessage={'URL cannot be empty'}
-                            isValid={isUrlValid}
-                            width={362}
-                            isDisabled={false}
-                            onKeyDown={handleKeyDown}
-                            defaultValue={props.instance ? props.instance.url : undefined}
-                            withRightPadding={false}
-                        />
-                        <Checkbox
-                            isChecked={isAutoDetect}
-                            label="Detect release automatically"
-                            onChange={handleAutoDetect}
-                            name="checkbox-auto-detect"
-                        />
-                    </ModalDialog>
+                    <div data-cy={'buildModal'}>
+                        <ModalDialog
+                            onClose={close}
+                            heading={props.isEdit ? 'Update build' : 'Create build'}
+                            width='600px'
+                            components={{
+                                Footer: footer,
+                            }}
+                        >
+                            <StyledTextField
+                                onChange={handleName}
+                                placeholder={'Enter name'}
+                                description={'Build name'}
+                                incorrectMessage={'Build name cannot be empty.'}
+                                isValid={isNameValid}
+                                width={362}
+                                onKeyDown={handleKeyDown}
+                                isDisabled={false}
+                                defaultValue={props.instance ? props.instance.name : undefined}
+                                withRightPadding={true}
+                                dataCy={'buildName'}
+                            />
+                            <StyledElement
+                                targetElement={
+                                    <DatePicker
+                                        onChange={handleReleaseDate}
+                                        placeholder={"Pick a date"}
+                                        defaultValue={props.instance ? props.instance.release_date : undefined}
+                                        isInvalid={!isReleaseDateValid}
+                                        name={'releaseDateName'}
+                                    />
+                                }
+                                description={'Release date'}
+                                incorrectMessage={'Release date cannot be empty.'}
+                                isValid={isReleaseDateValid}
+                                width={162}
+                                withRightPadding={false}
+                                divDataCy={'releaseDate'}
+                            />
+                            <StyledTextArea
+                                onChange={handleDescription}
+                                placeholder={'Enter description'}
+                                description={'Description'}
+                                incorrectMessage={''}
+                                isValid={true}
+                                width={546}
+                                isDisabled={false}
+                                defaultValue={props.instance ? props.instance.description : undefined}
+                                withRightPadding={false}
+                                dataCy={'buildDescription'}
+                            />
+                            <StyledTextField
+                                onChange={handleReleaseNotes}
+                                placeholder={'Enter notes'}
+                                description={'Release notes'}
+                                incorrectMessage={''}
+                                isValid={true}
+                                width={546}
+                                isDisabled={false}
+                                onKeyDown={handleKeyDown}
+                                defaultValue={props.instance ? props.instance.release_notes : undefined}
+                                withRightPadding={false}
+                                dataCy={'buildNotes'}
+                            />
+                            <StyledElement
+                                targetElement={
+                                    <ReleasesSelect
+                                        onChange={handleReleaseSelect}
+                                        value={release}
+                                        ref={dropdownReleaseRef}
+                                        onKeyDown={keyDownForReleases}
+                                        isDisabled={isAutoDetect}
+                                        defaultValue={props.release}
+                                    />}
+                                description={"Release"}
+                                incorrectMessage={""}
+                                isValid={true}
+                                width={162}
+                                withRightPadding={true}
+                                divDataCy={'releaseName'}
+                            />
+                            <StyledTextField
+                                onChange={handleUrl}
+                                placeholder={'Enter URL'}
+                                description={'URL'}
+                                incorrectMessage={'URL cannot be empty'}
+                                isValid={isUrlValid}
+                                width={362}
+                                isDisabled={false}
+                                onKeyDown={handleKeyDown}
+                                defaultValue={props.instance ? props.instance.url : undefined}
+                                withRightPadding={false}
+                                dataCy={'buildUrl'}
+                            />
+                            <Checkbox
+                                isChecked={isAutoDetect}
+                                label="Detect release automatically"
+                                onChange={handleAutoDetect}
+                                name="checkbox-auto-detect"
+                            />
+                        </ModalDialog>
+                    </div>
                 )}
             </ModalTransition>
         </div>

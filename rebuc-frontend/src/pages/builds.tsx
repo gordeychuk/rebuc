@@ -12,7 +12,6 @@ import {EditDeleteButtons} from "../components/buttons/edit-delete-buttons";
 import {DeleteBuildModal} from "../components/modals/delete-build-modal";
 import { ErrorFlag } from '../components/elements/failed-flag';
 import { FlagGroup } from '@atlaskit/flag';
-// import { useAuth } from '../context/auth';
 
 interface IBuildsRouteBaseProps {
     navigationViewController: any;
@@ -47,7 +46,6 @@ const tableHeader = {
             key: 'instance-notes',
             content: 'Release Notes',
             isSortable: true,
-            // width: 20
         },
         {
             key: 'actions',
@@ -57,7 +55,7 @@ const tableHeader = {
     ]
 };
 
-const BuildsRouteBase = (props: IBuildsRouteBaseProps) => {
+export const BuildsRouteBase = (props: IBuildsRouteBaseProps) => {
     const [flagGroup, setFlagGroup] = useState<ReactElement[]>([]);
     const [flagCounter, setFlagCounter] = useState<number>(0);
     const [releaseSelection, setReleaseSelection] = useState<ISelectValue>(
@@ -117,7 +115,6 @@ const BuildsRouteBase = (props: IBuildsRouteBaseProps) => {
                 setBuilds(buildsTemp);
                 setIsLoding(false);
             })
-            // .catch(error => addErrorFlag('Error', error))
     };
 
     useEffect(() => {

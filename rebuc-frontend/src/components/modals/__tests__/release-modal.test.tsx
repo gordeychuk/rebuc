@@ -4,7 +4,7 @@ import {CreateUpdateReleaseModal} from "../add-edit-release-modal";
 import {act} from "react-dom/test-utils";
 import { AuthContext } from '../../../context/auth';
 import * as apiReleases from "../../../api-helpers/api-releases";
-import {selectBuild} from "./common";
+import {selectBuild} from "../__tests_helpers__/common";
 
 configure({testIdAttribute: 'data-cy'});
 jest.mock("../../../api-helpers/api-builds");
@@ -13,7 +13,7 @@ jest.mock("../../../api-helpers/api-releases");
 
 const testRelease = {
     id: '0',
-    name: 'test',
+    name: 'Release 1',
     description: 'testdesc',
     release_date: '2020-01-02',
     builds: [],
@@ -84,7 +84,7 @@ test('opens edit release modal', () => {
     openReleaseModal(modal);
 
     expect(modal.getByTestId('releaseModal')).toBeInTheDocument();
-    expect(modal.getByText(testRelease.name)).toBeInTheDocument();
+    expect(modal.getByPlaceholderText('Enter name').getAttribute('value')).toEqual(testRelease.name);
     expect(modal.getByDisplayValue(testRelease.description)).toBeInTheDocument();
     expect(modal.getByDisplayValue(testRelease.release_date)).toBeInTheDocument();
     expect(modal.getByDisplayValue(testRelease.release_pattern.build_mask)).toBeInTheDocument();
