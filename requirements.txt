@@ -1,4 +1,4 @@
-djangorestframework==3.11.0
+djangorestframework==3.11.2
 Django==2.2.18
 psycopg2-binary==2.8.4
 packaging==20.1
